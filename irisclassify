@@ -1,0 +1,45 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df=pd.read_csv("D:\Skpython\internprojects-2\Iris.csv")
+df.head()
+
+df.shape
+df.info()
+#to check NULL values in dataset
+df.isnull().sum()
+df.describe()
+
+df['Species'].unique()
+df_setosa = df.loc[df['Species']=='Iris-setosa']
+df_versicolor = df.loc[df['Species']=='Iris-versicolor']
+df_virginica = df.loc[df['Species']=='Iris-virginica']
+df_setosa.head()
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+df.drop('Id', axis=1, inplace=True)
+X = df.drop('Species', axis=1)
+Y = df['Species']
+X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+sns.boxplot(data=pd.DataFrame(X_train_scaled, columns=X_train.columns))
+plt.title('Scaled Features')
+plt.show()
+
+sns.scatterplot(x='SepalLengthCm',y='PetalLengthCm',data=df,hue='Species')
+plt.show()
+
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train_scaled, y_train)
+
+train_preds = model.predict(X_train_scaled)
+test_preds = model.predict(X_test_scaled)
+print("Training Accuracy:", accuracy_score(y_train, train_preds))
+print("Testing Accuracy:", accuracy_score(y_test, test_preds))
